@@ -19,13 +19,13 @@ func (p *player) init(position v2) {
 }
 
 func (p *player) move(dt float64) error {
-    if (inpututil.IsKeyJustPressed(keyJump)) {
+    if (inpututil.IsKeyJustPressed(KeyJump)) {
         assets.SfxPlayJump()
-        p.velocity.y = playerJumpVel
+        p.velocity.y = PlayerJumpVel
     }
-    p.velocity.y += playerGravity * dt * 0.5
+    p.velocity.y += PlayerGravity * dt * 0.5
     p.position.y += p.velocity.y * dt
-    p.velocity.y += playerGravity * dt * 0.5
+    p.velocity.y += PlayerGravity * dt * 0.5
 
     return nil
 }

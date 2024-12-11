@@ -16,23 +16,22 @@ import (
 )
 
 const (
-    screenWidth = 160
-    screenHeight = 144
-    playerGravity = 500
-    playerJumpVel = -210
-    pipeSpeed = 60
-    pipeGapX = 100
-    pipeGapY = 60
-    pipeScreenMargin = 7
-    pipeN = screenWidth / pipeGapX + 1
-    keyJump = ebiten.KeySpace
-    keyStartGame = ebiten.KeySpace
-    keyRestartGame = ebiten.KeyR
-    stateTitle = 0
-    statePlaying = 1
-    stateGameOver = 2
-    stateNewHighScore = 3
-    saveFilePath = "turd_highscore"
+    ScreenWidth = 160
+    ScreenHeight = 144
+    PlayerGravity = 500
+    PlayerJumpVel = -210
+    PipeSpeed = 60
+    PipeGapX = 100
+    PipeGapY = 60
+    PipeScreenMargin = 7
+    PipeN = ScreenWidth / PipeGapX + 1
+    KeyJump = ebiten.KeySpace
+    KeyStartGame = ebiten.KeySpace
+    KeyRestartGame = ebiten.KeyR
+    StateTitle = 0
+    StatePlaying = 1
+    StateGameOver = 2
+    StateNewHighScore = 3
 )
 
 func init() {
@@ -52,9 +51,9 @@ func main() {
             color.RGBA{48,98,48,255},
             color.RGBA{15,56,15,255},
         },
-        state : stateTitle,
+        state : StateTitle,
         player : player{},
-        pipePairs: [pipeN]pipePair{},
+        pipePairs: [PipeN]pipePair{},
         highScore: highScore,
     }
     game.prepareNewGame()
@@ -68,7 +67,7 @@ type Game struct{
     player player
     palette color.Palette
     state int
-    pipePairs [pipeN]pipePair
+    pipePairs [PipeN]pipePair
     score uint64
     highScore uint64
     distFromPipe float64
@@ -79,7 +78,7 @@ func (g *Game ) prepareNewGame() {
     g.score = 0
     g.player.init(v2{16,16})
     for i := range g.pipePairs {
-        g.pipePairs[i].init( screenWidth + pipeGapX * float64(i) )
+        g.pipePairs[i].init( ScreenWidth + PipeGapX * float64(i) )
     }
     g.distFromPipe = g.pipePairs[0].position.x - g.player.position.x
 }
@@ -92,11 +91,11 @@ func (g *Game) Update() error {
     lastTime = currentTime
 
     switch g.state {
-    case stateTitle:
-        if (inpututil.IsKeyJustPressed(keyStartGame)) {
-            g.state = statePlaying
+    case StateTitle:
+        if (inpututil.IsKeyJustPressed(KeyStartGame)) {
+            g.state = StatePlaying
         }
-    case statePlaying:
+    case StatePlaying:
 
 
         err := g.player.move(dt)
@@ -104,7 +103,7 @@ func (g *Game) Update() error {
 
         player_rect := g.player.rect()
 
-        var newDistFromPipe float64 = screenWidth
+        var newDistFromPipe float64 = ScreenWidth
 
         for i := range g.pipePairs {
             pp := &g.pipePairs[i]
@@ -126,7 +125,7 @@ func (g *Game) Update() error {
 
         }
 
-        screenRect := rect{ v2{0, 0}, v2{screenWidth, screenHeight} }
+        screenRect := rect{ v2{0, 0}, v2{ScreenWidth, ScreenHeight} }
         if !player_rect.overlaps(&screenRect) {
             if err := g.handleDefeat(); err != nil {
                 return err
@@ -139,10 +138,10 @@ func (g *Game) Update() error {
         }
         g.distFromPipe = newDistFromPipe
 
-    case stateGameOver, stateNewHighScore:
-        if (inpututil.IsKeyJustPressed(keyRestartGame)) {
+    case StateGameOver, StateNewHighScore:
+        if (inpututil.IsKeyJustPressed(KeyRestartGame)) {
             g.prepareNewGame()
-            g.state = statePlaying
+            g.state = StatePlaying
         }
     }
 
@@ -153,13 +152,13 @@ func (g *Game) handleDefeat() error {
     if g.highScore < g.score {
         assets.SfxPlayNewHighscore()
         g.highScore = g.score
-        g.state = stateNewHighScore
+        g.state = StateNewHighScore
         if err := setHighScore(g.highScore); err != nil {
             return err
         }
     } else {
         assets.SfxPlayDie()
-        g.state = stateGameOver
+        g.state = StateGameOver
     }
     return nil
 }
@@ -178,37 +177,37 @@ func (g *Game) Draw(screen *ebiten.Image) {
     screen.Fill(g.palette[0])
 
     switch g.state {
-    case stateTitle:
+    case StateTitle:
         g.drawEntities(screen)
         g.printToScreen(
             screen,
             fmt.Sprint(
                 "Best score: ", g.highScore, "\n",
-                "Press ", keyStartGame.String(), " to start",
+                "Press ", KeyStartGame.String(), " to start",
             ),
             8, 20,
         )
-    case statePlaying:
+    case StatePlaying:
         g.drawEntities(screen)
         g.printToScreen(screen, fmt.Sprint(g.score), 2, 9)
-    case stateGameOver:
+    case StateGameOver:
         g.drawEntities(screen)
         g.printToScreen(
             screen,
             fmt.Sprint(
                 "Score: ", g.score, "\n",
                 "Highscore: ", g.highScore, "\n",
-                "Press ", keyRestartGame.String(), " to restart",
+                "Press ", KeyRestartGame.String(), " to restart",
             ),
             2, 9,
         )
-    case stateNewHighScore:
+    case StateNewHighScore:
         g.drawEntities(screen)
         g.printToScreen(
             screen,
             fmt.Sprint(
                 "New highscore: ", g.highScore, "\n",
-                "Press ", keyRestartGame.String(), " to restart",
+                "Press ", KeyRestartGame.String(), " to restart",
             ),
             2, 9,
         )
@@ -223,7 +222,7 @@ func (g *Game) drawEntities(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return screenWidth, screenHeight
+	return ScreenWidth, ScreenHeight
 }
 
 

@@ -1,3 +1,4 @@
+//go:build !js
 // +build !js
 
 package main
@@ -5,11 +6,36 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
+var SaveFilePath string
+
+func init() {
+	var err error
+	SaveFilePath, err = expandPath("~/.turd_highscore")
+	if err != nil {
+		panic(fmt.Sprintf("Failed to set SaveFilePath: %v", err))
+	}
+}
+
+func expandPath(path string) (string, error) {
+	if strings.HasPrefix(path, "~") {
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			return "", err
+		}
+		return filepath.Join(homeDir, path[1:]), nil
+	}
+	return path, nil
+}
+
+
 func getHighScore() (uint64, error) {
-    file, err := os.OpenFile(saveFilePath, os.O_RDWR|os.O_CREATE, 0644)
+    file, err := os.OpenFile(SaveFilePath, os.O_RDWR|os.O_CREATE, 0644)
     if err != nil { return 0, err }
     defer file.Close()
     fileInfo, err := file.Stat()
@@ -22,7 +48,7 @@ func getHighScore() (uint64, error) {
 }
 
 func setHighScore(score uint64) error {
-	file, err := os.OpenFile(saveFilePath, os.O_RDWR|os.O_CREATE, 0644)
+	file, err := os.OpenFile(SaveFilePath, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil { return err }
 	defer file.Close()
 
