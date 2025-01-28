@@ -7,6 +7,8 @@ import (
     "strconv"
 )
 
+var saveFilePath string = "turd_highscore"
+
 func getHighScore() (uint64, error) {
     localStorage := js.Global().Get("localStorage")
     scoreStr := localStorage.Call("getItem", saveFilePath).String()
